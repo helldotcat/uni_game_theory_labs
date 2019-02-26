@@ -8,25 +8,28 @@ from sympy.matrices import Matrix
 class NumericalSolver:
     def __init__(self, input_matrix: List[List[int]]):
         self.payoff_matrix = Matrix(input_matrix)
+        self.braun_robinson_table = None
+
+    def solve(self):
+        self.braun_robinson_table = BraunRobinsonTable(
+            self.payoff_matrix,
+            self.get_maximin()[1][0],
+            self.get_minimax()[1][1],
+        )
+        self.braun_robinson_table.solve(0.1)
 
     def calculate_strategy_a(self):
-        braun_robinson_table = BraunRobinsonTable(
-            self.payoff_matrix,
-            self.get_maximin()[1][0],
-            self.get_minimax()[1][1],
-        )
-
-        braun_robinson_table.solve(0.1)
-        return braun_robinson_table.get_a_mixed_strategy()
+        return self.braun_robinson_table.get_a_mixed_strategy()
 
     def calculate_strategy_b(self):
-        braun_robinson_table = BraunRobinsonTable(
-            self.payoff_matrix,
-            self.get_maximin()[1][0],
-            self.get_minimax()[1][1],
-        )
-        braun_robinson_table.solve(0.1)
-        return braun_robinson_table.get_b_mixed_strategy()
+        return self.braun_robinson_table.get_b_mixed_strategy()
+
+    def calculate_game_cost(self) -> Rational:
+        a_mixed_strategy = self.braun_robinson_table.get_a_mixed_strategy()
+        b_mixed_strategy = self.braun_robinson_table.get_b_mixed_strategy()
+
+        return sum([self.payoff_matrix.row(i)[j]*a_mixed_strategy[i]*b_mixed_strategy[j]
+                    for i in range(len(a_mixed_strategy)) for j in range(len(b_mixed_strategy))])
 
     def get_maximin(self) -> Tuple[int, Tuple[int, int]]:
         mins_by_rows = self._find_extremums_by_axis('rows', fn=min)
@@ -64,13 +67,18 @@ class BraunRobinsonAlgorithmStep:
 
         self.a_gain = payoff_matrix.col(self.b_choice).T.tolist()[0]
         self.b_gain = payoff_matrix.row(self.a_choice).tolist()[0]
+        self.min_upper_game_cost = self.upper_game_cost
+        self.max_lower_game_cost = self.lower_game_cost
+
         if previous_step:
             self.a_gain = [sum(x) for x in zip(self.a_gain, previous_step.a_gain)]
             self.b_gain = [sum(x) for x in zip(self.b_gain, previous_step.b_gain)]
+            self.min_upper_game_cost = min((self.upper_game_cost, previous_step.min_upper_game_cost))
+            self.max_lower_game_cost = max((self.lower_game_cost, previous_step.max_lower_game_cost))
 
     @property
     def upper_game_cost(self) -> Rational:
-        return max(self.a_gain)/Rational(self.step_number)
+        return max(self.a_gain) / Rational(self.step_number)
 
     @property
     def lower_game_cost(self) -> Rational:
@@ -78,11 +86,20 @@ class BraunRobinsonAlgorithmStep:
 
     @property
     def epsilon(self) -> Rational:
-        return self.upper_game_cost - self.lower_game_cost
+        return self.min_upper_game_cost - self.max_lower_game_cost
 
     def __str__(self):
-        return f'{self.a_choice}|{self.b_choice}|{self.a_gain}|{self.b_gain}|' \
-            f'{self.lower_game_cost}|{self.upper_game_cost}|{float(self.epsilon)}'
+        return '{step_number:^5}|{a_choice:^3}|{b_choice:^3}|{a_gain:^25}|{b_gain:^25}|{lower_game_cost:^12}' \
+            '|{upper_game_cost:^12}|{epsilon:^8}'.format(
+                step_number=self.step_number,
+                a_choice=self.a_choice,
+                b_choice=self.b_choice,
+                a_gain=str(self.a_gain),
+                b_gain=str(self.b_gain),
+                lower_game_cost=str(self.lower_game_cost),
+                upper_game_cost=str(self.upper_game_cost),
+                epsilon=str(float(self.epsilon))[:8],
+            )
 
 
 class BraunRobinsonTable:
@@ -91,6 +108,8 @@ class BraunRobinsonTable:
         self.steps = []
 
         self.make_step(first_a, first_b)
+
+        print(BraunRobinsonTable.annotate_table())
         print(self.steps[-1])
 
     def solve(self, threshold: float = 0.01, max_steps: int = 2**64):
@@ -104,7 +123,7 @@ class BraunRobinsonTable:
             b_strategy = self._get_next_b_strategy()
         elif any([a_strategy is None, b_strategy is None]):
             raise Exception(
-                'Both strategy should be defined or should be None. Gor strategies: %s', [a_strategy, b_strategy]
+                'Both strategy should be defined or should be None. Got strategies: %s', [a_strategy, b_strategy]
             )
 
         step = BraunRobinsonAlgorithmStep(
@@ -128,6 +147,20 @@ class BraunRobinsonTable:
             counter[step.b_choice] += 1
 
         return [Rational(counter[choice], len(self.steps)) for choice in sorted(counter.keys())]
+
+    @staticmethod
+    def annotate_table():
+        return '{step_number:^5} {a_choice:^3} {b_choice:^3} {a_gain:^25} {b_gain:^25} {lower_game_cost:^12} ' \
+               '{upper_game_cost:^12} {epsilon:^8}'.format(
+            step_number='step',
+            a_choice='A',
+            b_choice='B',
+            a_gain='A gain',
+            b_gain='B gain',
+            lower_game_cost='v lower',
+            upper_game_cost='v upper',
+            epsilon='E',
+        )
 
     def _get_next_a_strategy(self) -> int:
         max_from_previous_a_gain = max(self.steps[-1].a_gain)
