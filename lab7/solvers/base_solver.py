@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Tuple
 
 from lab7.kernel_function import KernelFunction
 
@@ -26,5 +26,5 @@ class BaseSolver(ABC):
         self.kernel = kernel
 
     @abstractmethod
-    def solve(self) -> Tuple[float, float, Any]:
+    def solve(self) -> Tuple:
         pass
