@@ -1,4 +1,4 @@
-from typing import Callable, Tuple, Any
+from typing import Callable, Tuple, Any, List
 
 from sympy import Rational, Matrix
 
@@ -64,19 +64,19 @@ class NumericalSolver(BaseSolver):
         res = res[:-1] + ']'
         return res[:1] + res[2:]
 
-    def get_maximin(self, payoff_matrix: Matrix):
+    def get_maximin(self, payoff_matrix: Matrix) -> Tuple:
         mins_by_rows = self._find_extremums_by_axis(payoff_matrix, 'rows', fn=min)
         maximum = max(mins_by_rows, key=lambda x: x[0])
 
         return maximum[0], (mins_by_rows.index(maximum), maximum[1])
 
-    def get_minimax(self, payoff_matrix: Matrix):
+    def get_minimax(self, payoff_matrix: Matrix) -> Tuple:
         maxs_by_cols = self._find_extremums_by_axis(payoff_matrix, 'columns', fn=max)
         minimum = min(maxs_by_cols, key=lambda x: x[0])
 
         return minimum[0], (minimum[1], maxs_by_cols.index(minimum))
 
-    def _find_extremums_by_axis(self, payoff_matrix: Matrix, axis: str, fn: Callable):
+    def _find_extremums_by_axis(self, payoff_matrix: Matrix, axis: str, fn: Callable) -> List[Tuple]:
         if axis == 'columns':
             lines = [payoff_matrix.col(j).T.tolist()[0] for j in range(payoff_matrix.cols)]
         elif axis == 'rows':
