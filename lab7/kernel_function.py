@@ -39,5 +39,5 @@ class KernelFunction:
     def dH_dy_dy(self) -> Add:
         return diff(self.dH_dy, self.y)
 
-    def get_saddle_point(self, x: Rational, y: Rational):
+    def get_value_at_point(self, x: Rational, y: Rational):
         return self.H.subs(self.x, x).subs(self.y, y)
