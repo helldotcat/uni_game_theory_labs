@@ -9,7 +9,8 @@ from lab6.numerical import NumericalSolver
 def strategy_to_str(name: str, strategy: List[Rational]):
     float_strategy = [float(x) - float(x) % 0.01 for x in strategy]
 
-    return 'Mixed strategy {}: ['.format(name) + ', '.join(['{:.2}'.format(x) for x in float_strategy])\
+    return 'Mixed strategy {}: ['.format(name)\
+           + ', '.join(['{:.2}'.format(x) for x in float_strategy])\
            + '],\tstrategy sum: {:.2}'.format(float(sum(strategy)))
 
 
@@ -58,14 +59,26 @@ def main():
     numerical_strategy_a, numerical_strategy_b = solve_numerical(input_matrix)
 
     # Compare two methods (inaccuracy calculation)
-    a_strategy_inaccuracy = [float(abs(x[0] - x[1])) for x in zip(analytical_strategy_a, numerical_strategy_a)]
-    b_strategy_inaccuracy = [float(abs(x[0] - x[1])) for x in zip(analytical_strategy_b, numerical_strategy_b)]
+    a_strategy_inaccuracy = [
+        float(abs(x[0] - x[1]))
+        for x in zip(analytical_strategy_a, numerical_strategy_a)
+    ]
+    b_strategy_inaccuracy = [
+        float(abs(x[0] - x[1]))
+        for x in zip(analytical_strategy_b, numerical_strategy_b)
+    ]
 
     print('\n\nCompare two methods (inaccuracy calculation)'.upper())
     print('Inaccuracy for mixed strategies A: ',
-          '[' + ', '.join(['{:.2}'.format(x) for x in a_strategy_inaccuracy]) + ']')
+          '['
+          + ', '.join(['{:.2}'.format(x) for x in a_strategy_inaccuracy])
+          + ']'
+    )
     print('Inaccuracy for mixed strategies B: ',
-          '[' + ', '.join(['{:.2}'.format(x) for x in b_strategy_inaccuracy]) + ']')
+          '['
+          + ', '.join(['{:.2}'.format(x) for x in b_strategy_inaccuracy])
+          + ']'
+    )
 
 
 if __name__ == '__main__':
