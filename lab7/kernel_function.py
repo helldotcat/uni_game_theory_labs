@@ -20,8 +20,9 @@ class KernelFunction:
 
     @property
     def H(self) -> Add:
-        return (self.a * self.x ** 2) + (self.b * self.y ** 2) + (self.c * self.x * self.y) + (self.d * self.x) + \
-               self.e * self.y
+        return (self.a * self.x ** 2) + (self.b * self.y ** 2) + \
+               (self.c * self.x * self.y) + \
+               (self.d * self.x) + (self.e * self.y)
 
     @property
     def dH_dx(self) -> Add:

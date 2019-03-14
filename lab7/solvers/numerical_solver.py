@@ -54,33 +54,64 @@ class NumericalSolver(BaseSolver):
     def create_grid_matrix(self, steps: int) -> Matrix:
         res = []
         for i in range(steps+1):
-            res.append([self.kernel.get_value_at_point(Rational(i, steps), Rational(j, steps)) for j in range(steps+1)])
+            res.append(
+                [
+                    self.kernel.get_value_at_point(
+                        Rational(i, steps), Rational(j, steps)
+                    )
+                    for j in range(steps+1)
+                ]
+            )
         return Matrix(res)
 
     def matrix_to_str(self) -> str:
         res = '['
         for i in range(self.grid_matrix.rows):
-            res += ' [' + ', '.join(["{:8.3f}".format(float(i)) for i in self.grid_matrix.row(i)]) + ']\n'
+            res += ' ['
+            res += ', '.join(
+                    [
+                        "{:8.3f}".format(float(i))
+                        for i in self.grid_matrix.row(i)
+                    ]
+                )
+            res += ']\n'
         res = res[:-1] + ']'
         return res[:1] + res[2:]
 
     def get_maximin(self, payoff_matrix: Matrix) -> Tuple:
-        mins_by_rows = self._find_extremums_by_axis(payoff_matrix, 'rows', fn=min)
+        mins_by_rows = self._find_extremums_by_axis(
+            payoff_matrix, 'rows',
+            fn=min,
+        )
         maximum = max(mins_by_rows, key=lambda x: x[0])
 
         return maximum[0], (mins_by_rows.index(maximum), maximum[1])
 
     def get_minimax(self, payoff_matrix: Matrix) -> Tuple:
-        maxs_by_cols = self._find_extremums_by_axis(payoff_matrix, 'columns', fn=max)
+        maxs_by_cols = self._find_extremums_by_axis(
+            payoff_matrix, 'columns',
+            fn=max,
+        )
         minimum = min(maxs_by_cols, key=lambda x: x[0])
 
         return minimum[0], (minimum[1], maxs_by_cols.index(minimum))
 
-    def _find_extremums_by_axis(self, payoff_matrix: Matrix, axis: str, fn: Callable) -> List[Tuple]:
+    def _find_extremums_by_axis(
+            self,
+            payoff_matrix: Matrix,
+            axis: str,
+            fn: Callable
+    ) -> List[Tuple]:
         if axis == 'columns':
-            lines = [payoff_matrix.col(j).T.tolist()[0] for j in range(payoff_matrix.cols)]
+            lines = [
+                payoff_matrix.col(j).T.tolist()[0]
+                for j in range(payoff_matrix.cols)
+            ]
         elif axis == 'rows':
-            lines = [payoff_matrix.row(i).tolist()[0] for i in range(payoff_matrix.rows)]
+            lines = [
+                payoff_matrix.row(i).tolist()[0]
+                for i in range(payoff_matrix.rows)
+            ]
         else:
             raise Exception("Axis should be 'rows' or 'columns'")
 

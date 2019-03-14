@@ -18,7 +18,9 @@ def compute_analytical_solution(kernel_function: KernelFunction):
     x, y, H = analytical_solver.solve()
 
     print('АНАЛИТИЧЕСКОЕ РЕШЕНИЕ')
-    print('x={:2.3f} y={:2.3f} H={:2.3f}\n\n'.format(float(x), float(y), float(H)))
+    print('x={:2.3f} y={:2.3f} H={:2.3f}\n\n'.format(
+        float(x), float(y), float(H))
+    )
 
 
 def compute_numerical_solution(kernel_function: KernelFunction):
@@ -30,7 +32,9 @@ def compute_numerical_solution(kernel_function: KernelFunction):
             print(numerical_solver.matrix_to_str())
 
             x, y, H = numerical_solver.solve()
-            print('x={:2.3f} y={:2.3f} H={:2.3f}\n\n'.format(float(x), float(y), float(H)))
+            print('x={:2.3f} y={:2.3f} H={:2.3f}\n\n'.format(
+                float(x), float(y), float(H))
+            )
 
     except NoSolutionException as exception:
         print(exception)
@@ -45,13 +49,6 @@ def main():
         d=Rational(-12),
         e=Rational(-48)
     )
-    # kernel = KernelFunction(
-    #     a=Rational(-3),
-    #     b=Rational(3, 2),
-    #     c=Rational(18, 5),
-    #     d=Rational(-18, 50),
-    #     e=Rational(-72, 25)
-    # )
 
     compute_analytical_solution(kernel)
 
