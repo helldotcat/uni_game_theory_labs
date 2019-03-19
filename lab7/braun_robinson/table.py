@@ -12,14 +12,10 @@ class BraunRobinsonTable:
 
         self.make_step(first_a, first_b)
 
-        # print(BraunRobinsonTable.annotate_table())
-        # print(self.steps[-1])
-
     def solve(self, threshold: float = 0.01, max_steps: int = 2**64):
         while threshold < self.steps[-1].epsilon \
                 and max_steps > len(self.steps):
             self.make_step()
-            # print(self.steps[-1])
 
     def make_step(self, a_strategy: int = None, b_strategy: int = None):
         if all([a_strategy is None, b_strategy is None]):

@@ -26,15 +26,26 @@ def compute_analytical_solution(kernel_function: KernelFunction):
 def compute_numerical_solution(kernel_function: KernelFunction):
     print('ЧИСЛЕННОЕ РЕШЕНИЕ')
     try:
-        for steps in range(2, 11):
+        results = []
+        steps = 1
+        steps_shift = 10
+        while len(results) < steps_shift or abs(
+                    max(results[-1*steps_shift:]) -
+                    min(results[-1*steps_shift:])
+                ) > 0.01:
             print(f'N={steps}')
             numerical_solver = NumericalSolver(kernel_function, steps)
-            print(numerical_solver.matrix_to_str())
+
+            if steps <= 10:
+                print(numerical_solver.matrix_to_str())
 
             x, y, H = numerical_solver.solve()
+            results.append(H)
             print('x={:2.3f} y={:2.3f} H={:2.3f}\n\n'.format(
                 float(x), float(y), float(H))
             )
+
+            steps += 1
 
     except NoSolutionException as exception:
         print(exception)

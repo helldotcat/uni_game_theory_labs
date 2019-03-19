@@ -25,23 +25,28 @@ class NumericalSolver(BaseSolver):
 
         if maximin == minimax:
             print('Есть седловая точка:')
-            a_clear_strategy, b_clear_strategy = maximin[1][0], minimax[1][1]
+            a_clear_strategy = maximin[1][0]
+            b_clear_strategy = minimax[1][1]
 
         else:
             print('Седловой точки нет, решение методом Брауна-Робинсона:')
-            braun_robinson_table = BraunRobinsonTable(self.grid_matrix, maximin[1][0], minimax[1][1])
+            braun_robinson_table = BraunRobinsonTable(
+                self.grid_matrix, maximin[1][0], minimax[1][1]
+            )
             braun_robinson_table.solve(0.01)
 
             a_mixed_strategy = braun_robinson_table.get_a_mixed_strategy()
             b_mixed_strategy = braun_robinson_table.get_b_mixed_strategy()
 
             a_clear_strategy = max(
-                [(a_mixed_strategy[i], i) for i in range(len(a_mixed_strategy))],
+                [(a_mixed_strategy[i], i)
+                 for i in range(len(a_mixed_strategy))],
                 key=lambda x: x[0]
             )[1]
 
             b_clear_strategy = max(
-                [(b_mixed_strategy[j], j) for j in range(len(b_mixed_strategy))],
+                [(b_mixed_strategy[j], j)
+                 for j in range(len(b_mixed_strategy))],
                 key=lambda x: x[0]
             )[1]
 
