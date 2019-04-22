@@ -20,8 +20,7 @@ class MixedSolver(NashSolver):
         if len(nash_optimums) == 0:
             print('Отсуствуют ситуации равновесия по Нэшу в чистых стратегиях.'
                   ' Существует вполне смешанная ситуация равновесия в смешанном дополнении.')
-            print('Стратегия игрока A :', self.strategy_a)
-            print('Стратегия игрока B :', self.strategy_b)
+            self.print_mixed_strategies_and_gain()
             return nash_optimums
 
         if len(nash_optimums) == 2:
@@ -29,9 +28,14 @@ class MixedSolver(NashSolver):
             print_colored_matrix(Matrix(self.matrix), nash_optimums, BLUE_COLOR)
 
             print('Существует вполне смешанная ситуация равновесия в смешанном дополнении.')
-            print('Стратегия игрока A :', self.strategy_a)
-            print('Стратегия игрока B :', self.strategy_b)
+            self.print_mixed_strategies_and_gain()
             return nash_optimums
+
+    def print_mixed_strategies_and_gain(self) -> None:
+        print('Стратегия игрока A :', self.strategy_a_str)
+        print('Стратегия игрока B :', self.strategy_b_str, '\n')
+        print('Равновесный выигрыш A: {0:.3f}'.format(self.gain_a))
+        print('Равновесный выигрыш B: {0:.3f}'.format(self.gain_b))
 
     @property
     def matrix_a(self) -> Matrix:
@@ -59,14 +63,36 @@ class MixedSolver(NashSolver):
         ) * self.calculate_game_cost_b()
 
     @property
-    def strategy_a(self) -> str:
-        strategy = [float(x) for x in self.calculate_strategy_a().row(0).tolist()[0]]
-        return '[' + ', '.join(['{0:.2f}'.format(x) for x in strategy]) + ']'
+    def strategy_a(self) -> List[float]:
+        return [float(x) for x in self.calculate_strategy_a().row(0).tolist()[0]]
 
     @property
-    def strategy_b(self) -> str:
-        strategy = [float(x[0]) for x in self.calculate_strategy_b().col(0).tolist()]
-        return '[' + ', '.join(['{0:.2f}'.format(x) for x in strategy]) + ']'
+    def strategy_b(self) -> List[float]:
+        return [float(x[0]) for x in self.calculate_strategy_b().col(0).tolist()]
+
+    @property
+    def strategy_a_str(self) -> str:
+        return '[' + ', '.join(['{0:.3f}'.format(x) for x in self.strategy_a]) + ']'
+
+    @property
+    def strategy_b_str(self) -> str:
+        return '[' + ', '.join(['{0:.3f}'.format(x) for x in self.strategy_b]) + ']'
+
+    @property
+    def gain_a(self) -> float:
+        gain = 0
+        for i in range(self.matrix_a.rows):
+            for j in range(self.matrix_b.cols):
+                gain += self.matrix_a.row(i)[j] * self.strategy_a[i] * self.strategy_b[j]
+        return gain
+
+    @property
+    def gain_b(self) -> float:
+        gain = 0
+        for i in range(self.matrix_a.rows):
+            for j in range(self.matrix_b.cols):
+                gain += self.matrix_b.row(i)[j] * self.strategy_a[i] * self.strategy_b[j]
+        return gain
 
     def calculate_strategy_b(self) -> Matrix:
         return self.matrix_a.inv().multiply(

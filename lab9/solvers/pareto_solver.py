@@ -5,11 +5,9 @@ from lab9.solvers.base_solver import BaseSolver
 
 class ParetoSolver(BaseSolver):
     def _is_optimum_for_A(self, i: int, j: int) -> bool:
-        # column = self._get_column_for_A(j)
         column = [elem for x in self.matrix.tolist() for elem in x]
         current_value_A = self.matrix.row(i)[j][0]
         current_value_B = self.matrix.row(i)[j][1]
-        # print(column)
 
         estimations = []
         for temp_A, temp_B in column:
@@ -17,11 +15,9 @@ class ParetoSolver(BaseSolver):
                 estimations += [True]
             else:
                 estimations += [False]
-        # print(estimations)
         return not any(estimations)
 
     def _is_optimum_for_B(self, i: int, j: int) -> bool:
-        # row = self._get_row_for_B(i)
         row = [elem for x in self.matrix.tolist() for elem in x]
         current_value_A = self.matrix.row(i)[j][0]
         current_value_B = self.matrix.row(i)[j][1]
