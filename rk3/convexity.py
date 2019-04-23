@@ -34,4 +34,3 @@ def check_convexity():
 
     if is_convex:
         print('Характеристическая функция выпуклая')
-

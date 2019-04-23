@@ -16,7 +16,7 @@ def check_individual_rationalization(vector_shepli: List[float]):
             )
         else:
             print(
-                'Индивидуальная рационализация для игрока {0} не выполняется: {1:.3f} >= {2:.3f}'.format(
+                'Индивидуальная рационализация для игрока {0} не выполняется: {1:.3f} < {2:.3f}'.format(
                     i,
                     vector_shepli[i - 1],
                     C_F[frozenset([i])]
@@ -26,19 +26,19 @@ def check_individual_rationalization(vector_shepli: List[float]):
 
 def check_group_rationalization(vector_shepli: List[float]):
     print()
-    if sum(vector_shepli) == C_F[frozenset([i for i in range(1, N+1)])]:
+    if sum(vector_shepli) == C_F[frozenset(range(1, N+1))]:
         print(
             'Групповая рационализация выполняется: {0:.3f} == {0:.3f}'.format(
                 sum(vector_shepli),
-                C_F[frozenset([i for i in range(1, N+1)])]
+                C_F[frozenset(range(1, N+1))]
             )
         )
 
         return
 
     print(
-        'Групповая рационализация не выполняется: {0:.3f} == {0:.3f}'.format(
+        'Групповая рационализация не выполняется: {0:.3f} != {0:.3f}'.format(
             sum(vector_shepli),
-            C_F[frozenset([i for i in range(1, N + 1)])]
+            C_F[frozenset(range(1, N + 1))]
         )
     )

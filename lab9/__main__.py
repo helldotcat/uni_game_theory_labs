@@ -27,7 +27,9 @@ def main():
 
     print('Поиск вполне смешанной ситуации равновесия...\n')
 
-    mixed_solver = MixedSolver(Matrix(PLAYS['18 вариант']))
+    # mixed_solver = MixedSolver(Matrix(PLAYS['18 вариант']))
+    mixed_solver = MixedSolver(Matrix(PLAYS['Дилемма заключённого']))
+
     mixed_solver.get_optimums()
 
 
