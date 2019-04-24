@@ -34,6 +34,8 @@ class Sphere:
 
     def find_intersection(self) -> bool:
         for point in self.a_points:
+            self._calculate_distance(point, self.b_point)
+            self._calculate_distance(self.b_point, point)
             distance = self._calculate_distance(point, self.b_point)
 
             if distance < self.max_distance:
@@ -57,11 +59,6 @@ class Sphere:
         a_lbd = a_point.lbda
         b_lbd = b_point.lbda
 
-        return abs(
-            math.atan(
-                sqrt(
-                    (cos(b_phi)*sin(abs(a_lbd-b_lbd))) ** 2 +
-                    (cos(a_phi)*sin(b_phi) - sin(a_phi)*cos(b_phi)*cos(abs(a_lbd-b_lbd))) ** 2
-                )/(sin(a_phi)*sin(b_phi) + cos(a_phi)*cos(b_phi)*cos(abs(a_lbd-b_lbd)))
-            )
-        )
+        distance = math.acos(sin(a_phi)*sin(b_phi)+cos(a_phi)*cos(b_phi)*cos(abs(a_lbd-b_lbd)))
+
+        return distance
