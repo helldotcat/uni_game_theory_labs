@@ -1,3 +1,5 @@
+import math
+
 from lab8.sphere import Sphere
 from lab8.play import Play
 
@@ -5,9 +7,9 @@ from lab8.play import Play
 class Solver:
     def __init__(self):
         self.plays = []
-        self.plays_count = 10000
-        self.a_points = 50
-        self.max_distance = 0.1
+        self.plays_count = 100000
+        self.a_points = 1
+        self.max_distance = math.pi / 4
 
     def solve(self):
         for _ in range(self.plays_count):

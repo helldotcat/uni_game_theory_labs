@@ -4,9 +4,6 @@ import math
 from math import sqrt, sin, cos
 
 
-random.seed(88)
-
-
 class Point(NamedTuple):
     phi: float
     lbda: float
@@ -44,7 +41,7 @@ class Sphere:
 
     def _generate_random_point(self) -> Point:
         random_z = random.uniform(-1, 1)
-        phi = math.asin(random_z)
+        phi = math.acos(random_z)
         lbd = random.uniform(0, 2*math.pi)
 
         if lbd == 2 * math.pi:
@@ -60,5 +57,13 @@ class Sphere:
         b_lbd = b_point.lbda
 
         distance = math.acos(sin(a_phi)*sin(b_phi)+cos(a_phi)*cos(b_phi)*cos(abs(a_lbd-b_lbd)))
+
+        # distance = math.atan(
+        #     sqrt(
+        #         pow(cos(b_phi)*sin(abs(a_lbd-b_lbd)), 2)
+        #         + pow(cos(a_phi)*sin(b_phi) - sin(a_phi)*cos(b_phi)*cos(abs(a_lbd-b_lbd)), 2)
+        #     )
+        #     /(sin(a_phi)*sin(b_phi)+ cos(a_phi)*cos(b_phi)*cos(abs(a_lbd-b_lbd)))
+        # )
 
         return distance
