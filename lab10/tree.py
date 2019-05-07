@@ -1,4 +1,5 @@
-from pptree import print_tree
+from colorama import Fore, Style
+from lab10.pptree import print_tree
 from typing import List, Iterable
 import random
 from pprint import pprint
@@ -14,22 +15,43 @@ class Vertex:
         self.gains = []
         self.children = []
         self.parent = parent
+        self.in_best_path = False
 
         if self.parent:
             self.parent.children.append(self)
 
     def __str__(self):
-        str_res = str(self.gains) if len(self.gains) != 1 else str(self.gains[0])
-        if self.player:
-            return '─ {:<12s} {:>1s} ─'.format(str_res, str(self.player))
+        style = Fore.BLACK
 
-        return f' {str_res}'
+        if self.in_best_path:
+            style = Fore.RED
+
+        if len(self.gains) != 1:
+            str_res = str(self.gains)
+        else:
+            str_res = str(self.gains[0])
+
+        if self.player:
+            str_res = '─ ' + '{:<26s} {:>1s}'.format(str_res, str(self.player)) + ' ─'
+
+        if ']' in str_res:
+            splited = str_res.split(']')
+            splited[0] = splited[0] + ']'
+
+        else:
+            splited = str_res.split(')')
+            splited[0] = splited[0] + ')'
+
+        str_res = f'{style}' + splited[0]  + splited[1].replace(' ', '─') + f'{Style.RESET_ALL}'
+
+        return f'{str_res}'
 
 
 class Tree:
     def __init__(self):
         self.depth = 7
         self.gain_range = 0, 15
+        # self.gain_range = 0, 1500
         self.players = 3
         self.strategies = 2, 2, 2
 
@@ -109,6 +131,18 @@ class Tree:
 
         # self.print_tree()
 
+    def mark_best_path(self, level: int):
+        print(level)
+        vertexes_on_level = self._get_vertex_on_level(level)
+        if level == 0:
+            vertexes_on_level[0][0].in_best_path = True
+            return
+
+        for vertexes_series in vertexes_on_level:
+            parent_vertex = vertexes_series[0].parent
+            for vertex in vertexes_series:
+                if set(vertex.gains) & set(parent_vertex.gains) and parent_vertex.in_best_path:
+                    vertex.in_best_path = True
 
     @property
     def step_oder(self) -> List[int]:
@@ -117,70 +151,70 @@ class Tree:
     def print_tree(self):
         print_tree(self.root, childattr='children')
 
-    def print_tree_horizontal(self):
-        matrix = []
-        matrix_grid = []
-        print_grid = self._generate_print_grid()
-        pprint(print_grid)
-
-        # for level in list(reversed(range(self.depth+1))):
-        #     vertexes_on_level = self._get_vertex_on_level(level)
-        #     matrix_level = [[]]
-        #     matrix_grid.append([])
-        #
-        #     for vertexes_series in vertexes_on_level:
-        #         for vertex in vertexes_series:
-        #             cell_height = len(vertex.gains)
-        #             cell_width = len(str(vertex.gains))
-        #             matrix_grid[-1].append((cell_width, cell_height))
-        #             # max_len = max([len(str(x)) for x in vertex.gains])
-        #             # string_matrix_level[0].append(str(vertex.gains))
-        #
-        #     matrix += matrix_level
-        #
-        # pprint(matrix_grid)
-        # self._print_string_matrix(matrix)
-
-    def _generate_print_grid(self):
-        length_table = []
-        max_column_len = len('(, , )')
-        max_column_len += self.players * max([len(str(x)) for x in range(self.gain_range[0], self.gain_range[1])])
-
-        for level in range(self.depth+1):
-            vertex_on_level = sum([len(vertexes_series) for vertexes_series in self._get_vertex_on_level(level)])
-            length_table.append([max_column_len for _ in range(vertex_on_level)])
-
-        grid = []
-
-        max_row_length = max([sum(length_row) for length_row in length_table])
-        for length_row in length_table:
-
-        return grid
-
-    def print_in_cell(self, width: int, height: int, text: str):
-        text_rows = text.split('\n')
-        padding_rows_count = height - len(text_rows)
-        rows_before = rows_after = 0
-        if padding_rows_count:
-            rows_before = rows_after = int(padding_rows_count / 2)
-            if padding_rows_count % 2 == 1:
-                rows_before += 1
-        result_str = ''
-
-        for _ in range(rows_before):
-            result_str += ' ' * width + '\n'
-
-        format_str = '{:^'+ str(width) +'s}'
-        for text_row in text_rows:
-            result_str += format_str.format(text_row) + '\n'
-
-        for _ in range(rows_after):
-            result_str += ' ' * width + '\n'
-
-        return result_str
-
-
-    def _print_string_matrix(self, print_matrix: List[List[str]]):
-        for row in print_matrix:
-            print(''.join(row))
-
+    # def print_tree_horizontal(self):
+    #     matrix = []
+    #     matrix_grid = []
+    #     print_grid = self._generate_print_grid()
+    #     pprint(print_grid)
+    #
+    #     # for level in list(reversed(range(self.depth+1))):
+    #     #     vertexes_on_level = self._get_vertex_on_level(level)
+    #     #     matrix_level = [[]]
+    #     #     matrix_grid.append([])
+    #     #
+    #     #     for vertexes_series in vertexes_on_level:
+    #     #         for vertex in vertexes_series:
+    #     #             cell_height = len(vertex.gains)
+    #     #             cell_width = len(str(vertex.gains))
+    #     #             matrix_grid[-1].append((cell_width, cell_height))
+    #     #             # max_len = max([len(str(x)) for x in vertex.gains])
+    #     #             # string_matrix_level[0].append(str(vertex.gains))
+    #     #
+    #     #     matrix += matrix_level
+    #     #
+    #     # pprint(matrix_grid)
+    #     # self._print_string_matrix(matrix)
+    #
+    # def _generate_print_grid(self):
+    #     length_table = []
+    #     max_column_len = len('(, , )')
+    #     max_column_len += self.players * max([len(str(x)) for x in range(self.gain_range[0], self.gain_range[1])])
+    #
+    #     for level in range(self.depth+1):
+    #         vertex_on_level = sum([len(vertexes_series) for vertexes_series in self._get_vertex_on_level(level)])
+    #         length_table.append([max_column_len for _ in range(vertex_on_level)])
+    #
+    #     grid = []
+    #
+    #     max_row_length = max([sum(length_row) for length_row in length_table])
+    #     for length_row in length_table:
+    #
+    #     return grid
+    #
+    # def print_in_cell(self, width: int, height: int, text: str):
+    #     text_rows = text.split('\n')
+    #     padding_rows_count = height - len(text_rows)
+    #     rows_before = rows_after = 0
+    #     if padding_rows_count:
+    #         rows_before = rows_after = int(padding_rows_count / 2)
+    #         if padding_rows_count % 2 == 1:
+    #             rows_before += 1
+    #     result_str = ''
+    #
+    #     for _ in range(rows_before):
+    #         result_str += ' ' * width + '\n'
+    #
+    #     format_str = '{:^'+ str(width) +'s}'
+    #     for text_row in text_rows:
+    #         result_str += format_str.format(text_row) + '\n'
+    #
+    #     for _ in range(rows_after):
+    #         result_str += ' ' * width + '\n'
+    #
+    #     return result_str
+    #
+    #
+    # def _print_string_matrix(self, print_matrix: List[List[str]]):
+    #     for row in print_matrix:
+    #         print(''.join(row))
+    #

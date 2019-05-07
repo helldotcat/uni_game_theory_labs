@@ -14,8 +14,8 @@ def main():
     solver = Solver(tree=tree)
     solver.solve()
 
-    # tree.print_tree()
-    tree.print_tree_horizontal()
+    tree.print_tree()
+    # tree.print_tree_horizontal()
 
     solver.print_results()
 

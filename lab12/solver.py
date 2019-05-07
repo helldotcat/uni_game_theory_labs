@@ -2,6 +2,7 @@ from typing import Tuple
 
 from sympy import Matrix
 
+from lab12.print import print_matrix
 
 class Solver:
     def __init__(self, trust_matrix: Matrix):
@@ -19,6 +20,10 @@ class Solver:
 
             final_opinions_vector = iterated_matrix.multiply(opinions_vector.T)
             epsilon = self._calculate_epsilon(final_opinions_vector)
+
+        print('Сошедшаяся матрица')
+        print_matrix(iterated_matrix)
+        print()
 
         return final_opinions_vector.T, iterations
 
